@@ -15,14 +15,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use('/pay', async (req:any, res:any) => {
     const {token, product} = req.body
-
     const customer = await stripe.customers.create({
         email: token.email,
-        source: token.id
+        source: token
     })
-    console.log(customer)
     const charge = await stripe.charges.create({
-        amount: product.price * 100,
+        amount: Number(product.price) * 100,
         currency: 'usd',
         customer: customer.id,
         receipt_email: token.email,
@@ -37,8 +35,8 @@ app.use('/pay', async (req:any, res:any) => {
                 postal_code: token.address_zip,
             }
         }
-    },{idempotencyKey: '1'})
-    console.log(charge)
+    })
+    res.send(charge.status)
 })
 
 

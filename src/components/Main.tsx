@@ -1,13 +1,13 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {View, StyleSheet, TouchableOpacity, Text, ScrollView} from 'react-native'
 import { FontAwesome } from '@expo/vector-icons';
 import {useC, useUpdateC} from '../context/Context'
+import i18n from 'i18n-js';
 
 const testProduct = {
-    price: '0.00$',
+    price: '1',
     name: 'some product',
 }
-
 
 const Main = ({navigation}:any) => {
 
@@ -29,19 +29,26 @@ const Main = ({navigation}:any) => {
         }
     }
 
-    console.log(context)
+    useEffect(() => {
+        if (context.purchases !== undefined) {
+            setInPurchases(true)
+        } else {
+            setInPurchases(false)
+        }
+    }, [context.purchases])
+
 
     return (
         <View style={styles.Container}>
             <View style={styles.Header}>
-                <Text style={styles.HeaderText}>Welcome {context.familyName}{' '}{context.givenName}</Text>
-                <Text style={styles.HeaderText}>Chose your product</Text>
+                <Text style={styles.HeaderText}>{i18n.t('mainHeaderText1')} {context.familyName}{' '}{context.givenName}</Text>
+                <Text style={styles.HeaderText}>{i18n.t('mainHeaderText2')}</Text>
             </View>
 
         
             <ScrollView style={{height: '50%'}}>
                 <View style={styles.Product}>
-                    <Text style={styles.ProductHeader}>{testProduct.name}{' '}{testProduct.price}</Text>
+                    <Text style={styles.ProductHeader}>{testProduct.name}{' '}${testProduct.price}</Text>
                     <TouchableOpacity style={styles.ProductButton} onPress={() => Purchase()}>
                         <FontAwesome name="shopping-basket" size={20} color={inPurchases ? "#ff1c1c" : "#02c71c"} />
                     </TouchableOpacity>
@@ -49,7 +56,7 @@ const Main = ({navigation}:any) => {
             </ScrollView>
             
             <TouchableOpacity style={styles.Nav} onPress={() => navigation.navigate('Purchases')}>
-                <Text style={styles.NavT}>Go to purchases</Text>
+                <Text style={styles.NavT}>{i18n.t('purchasesButtonText')}</Text>
             </TouchableOpacity>
 
         </View>

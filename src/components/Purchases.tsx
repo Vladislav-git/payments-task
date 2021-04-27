@@ -1,9 +1,9 @@
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import {View, StyleSheet, TouchableOpacity, Text, ScrollView} from 'react-native'
-import { FontAwesome } from '@expo/vector-icons';
 import { PaymentsStripe as Stripe } from 'expo-payments-stripe';
 import {useC, useUpdateC} from '../context/Context'
 import axios from 'axios'
+import i18n from 'i18n-js';
 
 const Purchases = () => {
 
@@ -13,46 +13,43 @@ const Purchases = () => {
     const Buy = async() => {
         await Stripe.setOptionsAsync({
             publishableKey: 'pk_test_51IkNliKkNQOErIGphP8WOmqJbmxbGAmfg9BnL9nVzPVuUcAJ7OlBjIUrTtXvuoRPto5jg4DOj2tEqNSz4IkkLd48002tEApkEO', // Your key
-            // androidPayMode: 'test', // [optional] used to set wallet environment (AndroidPay)
         });
         const res:any = await Stripe.paymentRequestWithCardFormAsync();
-        console.log(res, 2)
-        const response = await axios({
+        axios({
             method: 'post',
             data: {token: res.tokenId, product: context.purchases},
             url: 'http://192.168.31.181:8000/pay',
         })
-        if (response.status === 200) {
-            console.log('ok')
-        } else {
-            console.log('e')
-        }
+            .then(status => {
+                if (status.data === 'succeeded') {
+                    alert('Purchase was successfull')
+                    updateData({...context, purchases: undefined})
+                } else {
+                    alert(status.data)
+                }
+            })
+            .catch(e => alert(e))
     }
 
-
-    useEffect(() => {
-        async() => {
-            
-            console.log(Stripe.stripeInitialized, 1)
-    }}, [])
-
-    
 
     return (
         <View style={styles.Container}>
             <View style={styles.Header}>
-                <Text style={styles.HeaderText}>Welcome {context.familyName}{' '}{context.givenName}</Text>
-                <Text style={styles.HeaderText}>Chose your product</Text>
+                <Text style={styles.HeaderText}>{i18n.t('purchasesHeaderText1')} {context.familyName}{' '}{context.givenName}</Text>
+                <Text style={styles.HeaderText}>{i18n.t('purchasesHeaderText2')}</Text>
             </View>
 
         
             <ScrollView style={{height: '50%'}}>
-                <View style={styles.Product}>
-                    <Text style={styles.ProductHeader}>{context.purchases.name}{' '}{context.purchases.price}</Text>
+                {context.purchases !== undefined
+                ? <View style={styles.Product}>
+                    <Text style={styles.ProductHeader}>{context.purchases.name}{' '}${context.purchases.price}</Text>
                     <TouchableOpacity style={styles.ProductButton} onPress={async() => await Buy()}>
-                        <Text>Buy</Text>
+                        <Text>{i18n.t('buyButtonText')}</Text>
                     </TouchableOpacity>
                 </View>
+                : null
+                }
             </ScrollView>
 
         </View>

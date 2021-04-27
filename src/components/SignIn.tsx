@@ -1,13 +1,25 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {View, StyleSheet, TouchableOpacity, Text, Dimensions} from 'react-native'
 import { FontAwesome } from '@expo/vector-icons';
-import {useC, useUpdateC} from '../context/Context'
+import {useUpdateC} from '../context/Context'
 import * as Google from 'expo-google-app-auth';
+import * as Localization from 'expo-localization';
+import i18n from 'i18n-js';
+import {Ru, En} from '../../localization'
+
+// Set the key-value pairs for the different languages you want to support.
+i18n.translations = {
+  en: En,
+  ru: Ru,
+};
+// Set the locale once at the beginning of your app.
+i18n.locale = Localization.locale;
+// When a value is missing from a language it'll fallback to another language with the key present.
+i18n.fallbacks = true;
 
 
 const SignIn = ({navigation}:any) => {
 
-    const {context}:any = useC()
     const {updateData}:any = useUpdateC();
 
     const logIn = async () => {
@@ -26,7 +38,7 @@ const SignIn = ({navigation}:any) => {
     return (
         <View style={styles.Container}>
             <View style={styles.Header}>
-                <Text style={styles.HeaderText}>In this app i learn how to use expo google sign in, expo payments, and expo localization</Text>
+                <Text style={styles.HeaderText}>{i18n.t('signInHeaderText')}</Text>
             </View>
 
             <View style={styles.Content}>
@@ -34,7 +46,7 @@ const SignIn = ({navigation}:any) => {
                     <View style={styles.IconWrapper}>
                         <FontAwesome style={styles.Icon} name="google" size={32} color="#02c71c" />
                     </View>
-                    <Text style={styles.GoogleButtonText}>Sign in with Google</Text>
+                    <Text style={styles.GoogleButtonText}>{i18n.t('googleButtonText')}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -59,7 +71,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontFamily: 'monospace',
         fontWeight: 'bold',
-        borderWidth: 1,
         alignSelf: 'center',
         backgroundColor: '#25effa'
     },
